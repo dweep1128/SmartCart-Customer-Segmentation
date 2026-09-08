@@ -27,7 +27,11 @@ ARTIFACTS_DIR = PROJECT_ROOT / "artifacts"
 sys.path.insert(0, str(PROJECT_ROOT))
 from pipeline_utils import RAW_INPUT_COLS, cluster_confidence  # noqa: E402
 
-DEFAULT_ORIGINS = "http://localhost:8000,http://127.0.0.1:8000,http://localhost:5500,http://127.0.0.1:5500"
+DEFAULT_ORIGINS = ",".join([
+    "https://dweep1128.github.io",  # GitHub Pages (project pages share this origin)
+    "http://localhost:8000", "http://127.0.0.1:8000",
+    "http://localhost:5500", "http://127.0.0.1:5500",
+])
 N_DRIVERS = 3  # feature comparisons shown per prediction
 
 model = joblib.load(ARTIFACTS_DIR / "model.joblib")

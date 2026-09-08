@@ -4,6 +4,14 @@ Serves the customer-segmentation model from `SmartCart.ipynb` as a FastAPI backe
 with a static, build-free frontend. Given one customer's raw record it returns the
 KMeans segment they fall into and how confident that call is across all four segments.
 
+**Live demo:** https://dweep1128.github.io/SmartCart-Customer-Segmentation/
+**Backend API:** https://smartcart-customer-segmentation-xfyh.onrender.com (`/docs` for the schema)
+
+> The backend is on Render's free tier: it sleeps after 15 minutes idle, so the
+> **first request after a nap takes ~50 seconds** to wake. The page shows a
+> "waking the server" state and waits it out — a slow first load is expected, not
+> a bug. Every request after that is instant until it idles again.
+
 ## What the model does
 
 The notebook is **unsupervised** — there is no target variable. It engineers features,
@@ -76,7 +84,8 @@ train.py               reproduce pipeline, write artifacts/
 pipeline_utils.py      shared FeatureEngineer + constants + confidence fn
 artifacts/             model.joblib, preprocessor.joblib, feature_columns.json, segments.json
 backend/main.py        FastAPI app: POST /predict, GET /health, GET /segments
-frontend/              index.html, styles.css, app.js  (no build step)
+docs/                  index.html, styles.css, app.js  (no build step)
+                       — GitHub Pages source of truth; there is no frontend/ copy
 requirements.txt       pinned runtime deps
 runtime.txt / .python-version   3.12.7
 ```
@@ -109,30 +118,36 @@ Environment (see `.env.example`):
 | var | default | meaning |
 |---|---|---|
 | `PORT` | `8000` | bind port, always on `0.0.0.0` |
-| `ALLOWED_ORIGINS` | localhost:8000/5500 (+127.0.0.1) | comma-separated CORS origins |
+| `ALLOWED_ORIGINS` | `https://dweep1128.github.io` + localhost:5500 | comma-separated CORS origins |
+
+On Render, set `ALLOWED_ORIGINS` to `https://dweep1128.github.io` (the deployed
+default already includes it, so nothing breaks if you don't).
 
 ### 3. Frontend
 
-Serve the folder statically and open it:
+`docs/` is served straight from GitHub Pages (Settings → Pages → Deploy from
+branch → `main` / `/docs`). For local dev:
 
 ```bash
-python -m http.server 5500 --directory frontend
+python -m http.server 5500 --directory docs
 # open http://127.0.0.1:5500
 ```
 
-The API base URL is at the **top of `frontend/app.js`**:
+The API base URL is the **only** config, at the top of `docs/app.js`:
 
 ```js
-const API_BASE = "http://localhost:8000";   // <-- change to the deployed URL
+const API_BASE = "https://smartcart-customer-segmentation-xfyh.onrender.com";
+// local dev: "http://localhost:8000"
 ```
 
-When you point it at a deployed backend, add that frontend's origin to
-`ALLOWED_ORIGINS` on the backend.
+Cold start (Render free tier, ~50s after idle) is handled in the frontend: a
+75s fetch timeout and a distinct "waking the server" state, on both page load
+and the predict call.
 
 ## Quick check
 
 ```bash
-curl -s -X POST http://127.0.0.1:8000/predict -H "Content-Type: application/json" -d '{
+curl -s -X POST https://smartcart-customer-segmentation-xfyh.onrender.com/predict -H "Content-Type: application/json" -d '{
   "Year_Birth":1975,"Education":"Graduation","Marital_Status":"Married","Income":88000,
   "Kidhome":0,"Teenhome":0,"Dt_Customer":"2013-06-15","Recency":40,"MntWines":900,
   "MntFruits":26,"MntMeatProducts":520,"MntFishProducts":38,"MntSweetProducts":27,
@@ -143,10 +158,14 @@ curl -s -X POST http://127.0.0.1:8000/predict -H "Content-Type: application/json
 
 ## Deploy notes
 
-- `requirements.txt` pins `scikit-learn==1.6.1` — needed at load time to unpickle the
-  preprocessor, not just to train.
-- `runtime.txt` / `.python-version` pin `3.12.7`.
-- The backend must run from the project root (or with it importable) so
-  `pipeline_utils` resolves during `joblib.load`.
-- Free hosts cold-start; the frontend already handles the wake-up delay with one
-  automatic retry.
+**Backend (Render):** build `pip install -r requirements.txt`, start
+`uvicorn backend.main:app --host 0.0.0.0 --port $PORT` from the repo root (so
+`pipeline_utils` resolves during `joblib.load`). `requirements.txt` pins
+`scikit-learn==1.6.1` — needed to unpickle the preprocessor, not just to train.
+`runtime.txt` / `.python-version` pin `3.12.7`. Set `ALLOWED_ORIGINS` to the
+Pages origin. Free tier sleeps after 15 min idle → ~50s cold start.
+
+**Frontend (GitHub Pages):** Settings → Pages → Deploy from branch → `main`,
+folder `/docs`. `docs/.nojekyll` skips Jekyll. All asset paths are relative and
+all external resources (Google Fonts, the API) are HTTPS, so it works unchanged
+from `https://dweep1128.github.io/SmartCart-Customer-Segmentation/`.

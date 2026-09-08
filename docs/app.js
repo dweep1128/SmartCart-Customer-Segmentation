@@ -1,12 +1,16 @@
 /* ===================================================================
    SmartCart frontend
 
-   >>> API base URL — change this to your deployed backend URL <<<
+   >>> API base URL — the ONLY place it is set. No trailing slash. <<<
+   Local dev: "http://localhost:8000"
    =================================================================== */
-const API_BASE = "http://localhost:8000";
+const API_BASE = "https://smartcart-customer-segmentation-xfyh.onrender.com";
 /* =================================================================== */
 
-const REQUEST_TIMEOUT_MS = 12000;
+// Render's free tier sleeps after 15 min idle; the first request then takes
+// ~50s to wake. Timeout must outlast that; a hint appears while it happens.
+const COLD_START_TIMEOUT_MS = 75000;
+const WAKE_NOTICE_AFTER_MS = 3500;
 const VB_W = 400, VB_H = 356;      // svg viewBox
 const CX = 200, CY = 168;          // diamond centre
 const D = 104;                     // diamond half-extent for the segment anchors
@@ -97,10 +101,15 @@ function shortLabel(name) {
 }
 
 function layoutAnchors(meta) {
+  const ids = Object.keys(meta);
+  if (ids.length === 0) {
+    // placeholder diamond, shown while the backend is still waking
+    anchorPos = Object.fromEntries(SLOTS.map((s, i) => [String(i), { ...s, label: "" }]));
+    return;
+  }
   const spendOf = (id) => meta[id].profile.feature_means.Total_Spending;
-  const ids = Object.keys(meta).sort((a, b) => spendOf(a) - spendOf(b));
   anchorPos = {};
-  ids.forEach((id, i) => {
+  ids.sort((a, b) => spendOf(a) - spendOf(b)).forEach((id, i) => {
     anchorPos[id] = { ...SLOTS[i % SLOTS.length], label: shortLabel(meta[id].name) };
   });
 }
@@ -261,9 +270,15 @@ function setNotice(state, html) {
   notice.innerHTML = html;
 }
 
-async function callApi(payload, { retryOnWake = true } = {}) {
+const WAKING_HTML =
+  `<strong>Waking the server.</strong> The demo backend sleeps after 15 minutes idle
+   on Render's free tier — the first request can take up to a minute. This updates
+   automatically when it responds.`;
+
+async function callApi(payload) {
   const ctrl = new AbortController();
-  const timer = setTimeout(() => ctrl.abort(), REQUEST_TIMEOUT_MS);
+  const timeout = setTimeout(() => ctrl.abort(), COLD_START_TIMEOUT_MS);
+  const wakeHint = setTimeout(() => setNotice("waking", WAKING_HTML), WAKE_NOTICE_AFTER_MS);
   try {
     const res = await fetch(`${API_BASE}/predict`, {
       method: "POST",
@@ -271,7 +286,8 @@ async function callApi(payload, { retryOnWake = true } = {}) {
       body: JSON.stringify(payload),
       signal: ctrl.signal,
     });
-    clearTimeout(timer);
+    clearTimeout(timeout);
+    clearTimeout(wakeHint);
 
     if (res.status === 422) {
       const body = await res.json().catch(() => null);
@@ -281,28 +297,17 @@ async function callApi(payload, { retryOnWake = true } = {}) {
       setNotice("error", `The API rejected the input.<ul>${items}</ul>`);
       return;
     }
-    if ([502, 503, 504].includes(res.status)) throw new Error("waking");
     if (!res.ok) throw new Error(`server ${res.status}`);
-
     paintResult(await res.json());
   } catch (err) {
-    clearTimeout(timer);
-    const waking = err.name === "AbortError" || err.message === "waking";
-    if (waking && retryOnWake) {
-      setNotice("waking", "The API looks like it's waking up. Retrying in a moment…");
-      await new Promise((r) => setTimeout(r, 3500));
-      return callApi(payload, { retryOnWake: false });
-    }
-    if (waking) {
-      setNotice("waking",
-        `The API didn't respond in time. It may be a free host cold-starting.
-         <button type="button" id="retry-btn">Try again</button>`);
-    } else {
-      setNotice("error",
-        `Can't reach the API at <strong>${API_BASE}</strong>. Check the backend is running
-         and the URL at the top of <code>app.js</code> is right.
-         <button type="button" id="retry-btn">Try again</button>`);
-    }
+    clearTimeout(timeout);
+    clearTimeout(wakeHint);
+    const msg = err.name === "AbortError"
+      ? `No response after ${COLD_START_TIMEOUT_MS / 1000}s. The server may still be waking —
+         <button type="button" id="retry-btn">try again</button>.`
+      : `Can't reach the API at <strong>${API_BASE}</strong>.
+         <button type="button" id="retry-btn">Try again</button>`;
+    setNotice("error", msg);
     notice.querySelector("#retry-btn")?.addEventListener("click", () => runPrediction());
   }
 }
@@ -347,16 +352,31 @@ form.addEventListener("reset", () => {
 
 /* ---------- boot ---------- */
 (async function init() {
+  layoutAnchors({});          // placeholder diamond while /segments loads
+  renderMap();
+
+  const ctrl = new AbortController();
+  const timeout = setTimeout(() => ctrl.abort(), COLD_START_TIMEOUT_MS);
+  const wakeHint = setTimeout(() => {
+    hint.textContent = "Waking the server — the free tier sleeps when idle, first load takes up to a minute.";
+  }, WAKE_NOTICE_AFTER_MS);
   try {
-    const res = await fetch(`${API_BASE}/segments`, { signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS) });
+    const res = await fetch(`${API_BASE}/segments`, { signal: ctrl.signal });
+    clearTimeout(timeout);
+    clearTimeout(wakeHint);
     if (!res.ok) throw new Error();
     segmentMeta = await res.json();
     layoutAnchors(segmentMeta);
     renderMap();
+    hint.textContent = "Fill in the profile, then find the segment.";
   } catch {
-    hint.textContent = "Can't load segment data — start the backend, then refresh.";
+    clearTimeout(timeout);
+    clearTimeout(wakeHint);
+    hint.textContent = "Couldn't reach the backend.";
     card.dataset.state = "error";
     notice.innerHTML =
-      `Can't reach the API at <strong>${API_BASE}</strong>. Start the backend and refresh.`;
+      `Couldn't load segment data from <strong>${API_BASE}</strong> — it may be asleep.
+       <button type="button" id="init-retry">Retry</button>`;
+    notice.querySelector("#init-retry")?.addEventListener("click", () => location.reload());
   }
 })();

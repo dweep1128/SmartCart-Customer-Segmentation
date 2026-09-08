@@ -354,7 +354,8 @@ select option { background: var(--slab); color: var(--chalk); }
   transition: opacity .3s var(--ease);
 }
 .result-card[data-state="done"] .viz-hint,
-.result-card[data-state="loading"] .viz-hint { opacity: 0; }
+.result-card[data-state="loading"] .viz-hint,
+.result-card[data-state="waking"] .viz-hint { opacity: 0; }
 
 /* SVG element styling */
 .map-axis { stroke: var(--line); stroke-width: 1; }
@@ -375,7 +376,8 @@ select option { background: var(--slab); color: var(--chalk); }
 .marker-halo { fill: var(--ember-soft); }
 .marker-core { fill: var(--ember); stroke: var(--chalk); stroke-width: 1.5; }
 
-.result-card[data-state="loading"] #segment-map { animation: breathe 1.4s var(--ease) infinite; }
+.result-card[data-state="loading"] #segment-map,
+.result-card[data-state="waking"] #segment-map { animation: breathe 1.4s var(--ease) infinite; }
 @keyframes breathe { 50% { opacity: .45; } }
 
 /* verdict */
