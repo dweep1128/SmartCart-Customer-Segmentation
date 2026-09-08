@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SmartCart — Customer segment finder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,400;0,500;0,600;1,400&family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<div class="grain" aria-hidden="true"></div>
+<div class="app">
+
+  <header class="masthead">
+    <span class="mark">SmartCart<span class="mark-dot">.</span></span>
+    <h1>Customer segment finder</h1>
+    <p class="lede">Drop a shopper's profile onto the map. The model places them among
+      four behavioural segments learned from 2,236 loyalty members, and shows how close the call was.</p>
+  </header>
+
+  <main class="workbench">
+
+    <form id="profile-form" class="form-col" novalidate>
+
+      <fieldset class="group">
+        <legend><span class="group-index">01</span> Profile</legend>
+        <div class="grid">
+          <label class="field span-2">
+            <span class="field-label">Birth year</span>
+            <input type="number" name="Year_Birth" min="1900" max="2025" value="1975" required />
+          </label>
+          <label class="field span-2">
+            <span class="field-label">Education</span>
+            <div class="select-wrap">
+              <select name="Education" required>
+                <option value="Basic">Basic</option>
+                <option value="2n Cycle">2n Cycle</option>
+                <option value="Graduation" selected>Graduation</option>
+                <option value="Master">Master</option>
+                <option value="PhD">PhD</option>
+              </select>
+            </div>
+          </label>
+          <label class="field span-2">
+            <span class="field-label">Marital status</span>
+            <div class="select-wrap">
+              <select name="Marital_Status" required>
+                <option value="Single">Single</option>
+                <option value="Married" selected>Married</option>
+                <option value="Together">Together</option>
+                <option value="Divorced">Divorced</option>
+                <option value="Widow">Widow</option>
+              </select>
+            </div>
+          </label>
+        </div>
+      </fieldset>
+
+      <fieldset class="group">
+        <legend><span class="group-index">02</span> Household</legend>
+        <div class="grid">
+          <label class="field span-3">
+            <span class="field-label">Yearly income</span>
+            <div class="input-adorn">
+              <span class="adorn">$</span>
+              <input type="number" name="Income" min="1" max="600000" step="any" value="52000" required />
+            </div>
+          </label>
+          <div class="field span-3" role="group" aria-label="Children at home">
+            <span class="field-label">Children at home</span>
+            <div class="segmented" data-name="Kidhome">
+              <label><input type="radio" name="Kidhome" value="0" checked /><span>0</span></label>
+              <label><input type="radio" name="Kidhome" value="1" /><span>1</span></label>
+              <label><input type="radio" name="Kidhome" value="2" /><span>2</span></label>
+              <label><input type="radio" name="Kidhome" value="3" /><span>3+</span></label>
+            </div>
+          </div>
+          <div class="field span-3" role="group" aria-label="Teenagers at home">
+            <span class="field-label">Teenagers at home</span>
+            <div class="segmented" data-name="Teenhome">
+              <label><input type="radio" name="Teenhome" value="0" checked /><span>0</span></label>
+              <label><input type="radio" name="Teenhome" value="1" /><span>1</span></label>
+              <label><input type="radio" name="Teenhome" value="2" /><span>2</span></label>
+              <label><input type="radio" name="Teenhome" value="3" /><span>3+</span></label>
+            </div>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset class="group">
+        <legend><span class="group-index">03</span> Membership</legend>
+        <div class="grid">
+          <label class="field span-3">
+            <span class="field-label">Enrolled on</span>
+            <input type="date" name="Dt_Customer" min="2012-01-01" max="2014-12-31" value="2013-06-15" required />
+          </label>
+          <label class="field span-3">
+            <span class="field-label">Days since last purchase</span>
+            <input type="number" name="Recency" min="0" max="365" value="40" required />
+          </label>
+          <div class="field span-3" role="group" aria-label="Complained in last two years">
+            <span class="field-label">Complained recently</span>
+            <div class="segmented" data-name="Complain">
+              <label><input type="radio" name="Complain" value="0" checked /><span>No</span></label>
+              <label><input type="radio" name="Complain" value="1" /><span>Yes</span></label>
+            </div>
+          </div>
+          <div class="field span-3" role="group" aria-label="Accepted the last campaign">
+            <span class="field-label">Took the last offer</span>
+            <div class="segmented" data-name="Response">
+              <label><input type="radio" name="Response" value="0" checked /><span>No</span></label>
+              <label><input type="radio" name="Response" value="1" /><span>Yes</span></label>
+            </div>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset class="group">
+        <legend><span class="group-index">04</span> Category spend <span class="legend-note">last two years</span></legend>
+        <div class="grid tight">
+          <label class="field span-2">
+            <span class="field-label">Wine</span>
+            <div class="input-adorn"><span class="adorn">$</span><input type="number" name="MntWines" min="0" value="300" required /></div>
+          </label>
+          <label class="field span-2">
+            <span class="field-label">Fruit</span>
+            <div class="input-adorn"><span class="adorn">$</span><input type="number" name="MntFruits" min="0" value="26" required /></div>
+          </label>
+          <label class="field span-2">
+            <span class="field-label">Meat</span>
+            <div class="input-adorn"><span class="adorn">$</span><input type="number" name="MntMeatProducts" min="0" value="165" required /></div>
+          </label>
+          <label class="field span-2">
+            <span class="field-label">Fish</span>
+            <div class="input-adorn"><span class="adorn">$</span><input type="number" name="MntFishProducts" min="0" value="38" required /></div>
+          </label>
+          <label class="field span-2">
+            <span class="field-label">Sweets</span>
+            <div class="input-adorn"><span class="adorn">$</span><input type="number" name="MntSweetProducts" min="0" value="27" required /></div>
+          </label>
+          <label class="field span-2">
+            <span class="field-label">Gold products</span>
+            <div class="input-adorn"><span class="adorn">$</span><input type="number" name="MntGoldProds" min="0" value="44" required /></div>
+          </label>
+        </div>
+      </fieldset>
+
+      <fieldset class="group">
+        <legend><span class="group-index">05</span> Purchase channels</legend>
+        <div class="grid tight">
+          <label class="field span-2 stepper-field">
+            <span class="field-label">Deal purchases</span>
+            <div class="stepper"><button type="button" data-step="-1" aria-label="decrease">–</button>
+              <input type="number" name="NumDealsPurchases" min="0" max="60" value="2" required />
+              <button type="button" data-step="1" aria-label="increase">+</button></div>
+          </label>
+          <label class="field span-2 stepper-field">
+            <span class="field-label">Web purchases</span>
+            <div class="stepper"><button type="button" data-step="-1" aria-label="decrease">–</button>
+              <input type="number" name="NumWebPurchases" min="0" max="60" value="4" required />
+              <button type="button" data-step="1" aria-label="increase">+</button></div>
+          </label>
+          <label class="field span-2 stepper-field">
+            <span class="field-label">Catalog purchases</span>
+            <div class="stepper"><button type="button" data-step="-1" aria-label="decrease">–</button>
+              <input type="number" name="NumCatalogPurchases" min="0" max="60" value="3" required />
+              <button type="button" data-step="1" aria-label="increase">+</button></div>
+          </label>
+          <label class="field span-2 stepper-field">
+            <span class="field-label">Store purchases</span>
+            <div class="stepper"><button type="button" data-step="-1" aria-label="decrease">–</button>
+              <input type="number" name="NumStorePurchases" min="0" max="60" value="6" required />
+              <button type="button" data-step="1" aria-label="increase">+</button></div>
+          </label>
+          <label class="field span-2 stepper-field">
+            <span class="field-label">Site visits / month</span>
+            <div class="stepper"><button type="button" data-step="-1" aria-label="decrease">–</button>
+              <input type="number" name="NumWebVisitsMonth" min="0" max="60" value="6" required />
+              <button type="button" data-step="1" aria-label="increase">+</button></div>
+          </label>
+        </div>
+      </fieldset>
+
+      <div class="form-actions">
+        <button type="submit" class="run-btn">
+          <span class="run-label">Find segment</span>
+          <span class="run-spinner" aria-hidden="true"></span>
+        </button>
+        <button type="reset" class="ghost-btn">Reset</button>
+      </div>
+    </form>
+
+    <aside class="result-col">
+      <div class="result-card" id="result-card" data-state="idle">
+
+        <div class="viz-frame">
+          <svg id="segment-map" viewBox="0 0 400 356" role="img"
+               aria-label="Segment map showing the customer's position relative to the four segments">
+          </svg>
+          <div class="viz-hint" id="viz-hint">Fill in the profile, then find the segment.</div>
+        </div>
+
+        <div class="verdict" id="verdict">
+          <p class="verdict-kicker" id="verdict-kicker">Assigned segment</p>
+          <h2 class="verdict-name" id="verdict-name">—</h2>
+          <p class="verdict-desc" id="verdict-desc"></p>
+
+          <div class="drivers" id="drivers" hidden>
+            <p class="drivers-title">What placed this customer here</p>
+            <ul class="drivers-list" id="drivers-list"></ul>
+          </div>
+
+          <div class="spread" id="spread" aria-hidden="true"></div>
+
+          <details class="details" id="details" hidden>
+            <summary>Segment details</summary>
+            <table class="details-table" id="details-table"></table>
+          </details>
+
+          <p class="provenance" id="provenance" hidden>
+            Segment names are human-assigned labels for each cluster's statistics; the model itself outputs only a cluster ID.
+          </p>
+        </div>
+
+        <div class="notice" id="notice" role="status"></div>
+      </div>
+
+      <p class="api-tag">API · <span id="api-tag-url"></span></p>
+    </aside>
+
+  </main>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,98 @@
+{
+  "0": {
+    "name": "Budget-conscious families",
+    "description": "Lowest income and spending of the four segments. Usually couples with children at home.",
+    "profile": {
+      "size": 710,
+      "share_of_base": 0.318,
+      "share_living_alone": 0.0,
+      "feature_means": {
+        "Income": 35604.55,
+        "Recency": 49.69,
+        "NumDealsPurchases": 2.18,
+        "NumWebPurchases": 2.41,
+        "NumCatalogPurchases": 0.61,
+        "NumStorePurchases": 3.49,
+        "NumWebVisitsMonth": 6.48,
+        "Complain": 0.01,
+        "Response": 0.06,
+        "Age": 54.37,
+        "Customer_Tenure_Days": 332.92,
+        "Total_Spending": 131.23,
+        "Total_Children": 1.25
+      }
+    }
+  },
+  "1": {
+    "name": "Mid-market households",
+    "description": "Above-average income and spending. Usually couples with children at home.",
+    "profile": {
+      "size": 426,
+      "share_of_base": 0.191,
+      "share_living_alone": 0.183,
+      "feature_means": {
+        "Income": 59857.27,
+        "Recency": 48.34,
+        "NumDealsPurchases": 3.65,
+        "NumWebPurchases": 6.32,
+        "NumCatalogPurchases": 3.48,
+        "NumStorePurchases": 7.6,
+        "NumWebVisitsMonth": 5.58,
+        "Complain": 0.0,
+        "Response": 0.17,
+        "Age": 62.41,
+        "Customer_Tenure_Days": 408.28,
+        "Total_Spending": 796.14,
+        "Total_Children": 1.1
+      }
+    }
+  },
+  "2": {
+    "name": "Premium shoppers",
+    "description": "Highest income and spending of the four segments. Usually couples with few or no children.",
+    "profile": {
+      "size": 642,
+      "share_of_base": 0.287,
+      "share_living_alone": 0.402,
+      "feature_means": {
+        "Income": 74671.14,
+        "Recency": 49.77,
+        "NumDealsPurchases": 1.51,
+        "NumWebPurchases": 5.36,
+        "NumCatalogPurchases": 5.67,
+        "NumStorePurchases": 8.56,
+        "NumWebVisitsMonth": 3.02,
+        "Complain": 0.01,
+        "Response": 0.24,
+        "Age": 57.68,
+        "Customer_Tenure_Days": 348.82,
+        "Total_Spending": 1306.4,
+        "Total_Children": 0.32
+      }
+    }
+  },
+  "3": {
+    "name": "Budget-conscious single-parent households",
+    "description": "Below-average income and spending. Usually one adult with children at home.",
+    "profile": {
+      "size": 458,
+      "share_of_base": 0.205,
+      "share_living_alone": 1.0,
+      "feature_means": {
+        "Income": 38097.14,
+        "Recency": 48.04,
+        "NumDealsPurchases": 2.47,
+        "NumWebPurchases": 2.83,
+        "NumCatalogPurchases": 0.89,
+        "NumStorePurchases": 3.81,
+        "NumWebVisitsMonth": 6.5,
+        "Complain": 0.01,
+        "Response": 0.14,
+        "Age": 55.59,
+        "Customer_Tenure_Days": 342.34,
+        "Total_Spending": 183.28,
+        "Total_Children": 1.24
+      }
+    }
+  }
+}
